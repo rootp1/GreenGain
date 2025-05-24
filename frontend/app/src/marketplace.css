@@ -1,0 +1,190 @@
+/* General Styles */
+body {
+  
+    margin: 0;
+    padding: 0;
+    background-color: #f3f3f3;
+    height:150vh;
+  
+  }
+  
+  .marketplace-container {
+    font-family: "Pixelify Sans", sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      height:100vh;
+    }
+    
+    /* Claim Section */
+    .claim-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #eae3e3;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      box-shadow: 5px 5px black;
+    }
+    
+    .claim-text {
+      width: 50%;
+    }
+    
+    .claim-text h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #333;
+    }
+    
+    .claim-text p {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #666;
+    }
+    
+    .claim-action {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    
+    .claim-image {
+      width: 150px;
+      margin-bottom: 10px;
+    }
+    
+    .claim-button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+      margin-right: 17px;
+    }
+    
+    .claim-button:hover {
+      background-color: #45a049;
+    }
+  
+  /* Shop Section */
+  .shop-section h2 {
+    display:inline;
+    font-size: 1.8rem;
+    /* margin: 10px; */
+    color: rgb(0, 53, 0);
+    background-color: white;
+    box-shadow: 5px 5px black;
+    border-radius:5px;
+    margin-bottom:200px;
+  }
+  
+  /* Labels */
+  .shop-labels {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .label-button {
+    flex: 1;
+    padding: 10px;
+    background-color: #f5f5f5;
+    color: #333;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    text-align: center;
+  }
+  
+  .label-button.active,
+  .label-button:hover {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  /* Cards */
+  .shop-cards {
+      display: flex;
+      gap: 16px;
+      margin-top: 20px;
+    
+      /* Fixed size and scrolling behavior */
+      max-width: 100%; /* Prevent overflow from the parent container */
+      height: 400px; /* Set a fixed height for the strip */
+      overflow-x: auto; /* Enable horizontal scrolling */
+      /* overflow-y: hidden;  */
+      white-space: nowrap; /* Keep all elements in a single line */
+      padding-bottom: 10px; /* Space for visual comfort */
+    }
+  
+    .shop-cards::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Edge */
+  }
+    
+    .mcard {
+      flex: 0 0 auto; /* Prevent the cards from shrinking or growing */
+      width: 200px; /* Set a consistent width */
+      height:300px;
+      text-align: center;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+  
+  .mcard img {
+    max-width: 100%;
+    height: 200px;
+    width:252px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .mcard h3 {
+    margin: 10px 0;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .mcard p {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  /* Arrow Button */
+  .arrow-button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: 0.3s ease;
+    align-self: center;
+    margin: 20px 0;
+  }
+  
+  .arrow-button:hover {
+    background-color: #36846b;
+  }
+  
+  .shop-section{
+      height:73vh;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      padding:25px;
+      background-color: #36846b;
+      border-radius:10px ;
+      margin-bottom: 30px;
+      box-shadow: 5px 5px black;
+      height:380px;
+  }
