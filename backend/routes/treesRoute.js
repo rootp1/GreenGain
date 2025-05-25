@@ -1,11 +1,11 @@
 import express from "express";
-import { calculatePlantAge } from "../controller/sequestration.js";
-import { uploadtree,gettree} from "../controller/uploadController.js";
-const router =express.Router();
+import { uploadtree, gettree } from "../controller/uploadController.js";
+import passport from "../utils/passport.js";
 
-//router.get("/treeage",calculatePlantAge);
+const router = express.Router();
 
-router.post("/uploadtree",uploadtree);
-router.get("/gettree",gettree)
+// ✅ Protect routes with session-based auth
+router.post("/uploadtree", uploadtree);
+router.get("/gettree", passport.authenticate("session"), gettree);
 
 export default router;

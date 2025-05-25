@@ -37,7 +37,7 @@ export default function TreeUploader() {
             reader.onload = async () => {
                 const base64 = reader.result.split(",")[1];
                 try {
-                    const response = await axios.post("http://localhost:8080/upload", {
+                    const response = await api1.post("/upload", {
                         file: base64,
                         fileName: compressedFile.name,
                     });

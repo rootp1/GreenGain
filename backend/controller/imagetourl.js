@@ -1,29 +1,35 @@
-import ImageKit from "imagekit";
-import dotenv from 'dotenv';
+import axios from "axios";
+import dotenv from "dotenv";
 dotenv.config();
 
-const imagekit = new ImageKit({
-    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
-    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
-    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
-});
+console.log("IMGBB_API_KEY:", process.env.IMGBB_API_KEY);
 
-console.log("IMAGEKIT_PUBLIC_KEY:", process.env.IMAGEKIT_PUBLIC_KEY);
-console.log("IMAGEKIT_PRIVATE_KEY:", process.env.IMAGEKIT_PRIVATE_KEY);
-console.log("IMAGEKIT_URL_ENDPOINT:", process.env.IMAGEKIT_URL_ENDPOINT);
+export const uploadimage = async (req, res) => {
+  const { file, fileName } = req.body;
 
-export const uploadimage = async(req, res) => {
-    const { file, fileName } = req.body;
-    
-    try {
-        const response = await imagekit.upload({
-            file,
-            fileName,
-            folder: "/uploads",
-        });
-        res.status(200).json(response);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "File upload failed" });
-    }
-}
+  if (!file || !fileName) {
+    return res.status(400).json({ error: "Missing file or fileName" });
+  }
+
+  try {
+    const formData = new URLSearchParams();
+    formData.append("image", file);        // base64 string (no prefix)
+    formData.append("name", fileName);     // any name
+
+    const response = await axios.post(
+      `https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`,
+      formData.toString(), // must be string, not object
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      }
+    );
+
+    const imageUrl = response.data.data.url;
+    res.status(200).json({ url: imageUrl });
+  } catch (error) {
+    console.error("ImgBB Upload Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "File upload failed" });
+  }
+};

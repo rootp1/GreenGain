@@ -1,45 +1,54 @@
-import passport from "passport"
+import passport from "passport";
 import { Strategy } from "passport-local";
 import supabase from "../model/userdb.js";
 import bcrypt from "bcrypt";
 
 passport.use(
-    new Strategy(async function verify(username, password, cb) {
-      try {
-        const result = await supabase
-        .from('users')
-        .select()
-        .eq('username', username);
-        if (result.data.length > 0) {
-          const user = result.data[0];
-          const storedHashedPassword = user.password;
-          bcrypt.compare(password, storedHashedPassword, (err, valid) => {
-            if (err) {
-              console.error("Error comparing passwords:", err);
-              return cb(err);
-            } else {
-              if (valid) {
-                return cb(null, user);
-              } else {
-                return cb(null, false);
-              }
-            }
-          });
-        } else {
-          return cb("User not found");
-        }
-      } catch (err) {
-        console.log(err);
-        return cb(err);
-      }
-    })
-  );
+  new Strategy(async function verify(username, password, cb) {
+    try {
+      const result = await supabase
+        .from("users")
+        .select("id, username, password, email") // ✅ include id
+        .eq("username", username);
+    
 
-  passport.serializeUser((user, cb) => {
-    cb(null, user);
-  });
-  passport.deserializeUser((user, cb) => {
-    cb(null, user);
-  });
-  
+      if (result.data.length === 0) return cb(null, false);
+
+      const user = result.data[0];
+
+      bcrypt.compare(password, user.password, (err, valid) => {
+        if (err) return cb(err);
+        if (valid) return cb(null, user);
+        return cb(null, false);
+      });
+    } catch (err) {
+      return cb(err);
+    }
+  })
+);
+
+passport.serializeUser((user, cb) => {
+  if (!user || !user.id) {
+    console.error("Serialize error — user.id is missing:", user);
+    return cb(new Error("Cannot serialize user: id missing"));
+  }
+  cb(null, user.id); // ✅ use id instead of sno
+});
+
+
+passport.deserializeUser(async (id, cb) => {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select()
+      .eq("id", id)
+      .single();
+    if (error) return cb(error);
+    cb(null, data);
+  } catch (err) {
+    cb(err);
+  }
+});
+
+
 export default passport;
