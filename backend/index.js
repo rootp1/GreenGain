@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // ✅ Configure CORS and session
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "https://greengain.onrender.com/",
   credentials: true
 }));
 
