@@ -1,38 +1,64 @@
-import React ,{ useContext}from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import '../profile.css';
 import { AuthContext } from "../contexts/authContext";
+import { api1 } from "../services/api";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Profile() {
-    const { isAuthenticated, user, loading, signup, login, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+  const [quests, setQuests] = useState([]);
 
-    const pointinc=()=>{
-    var inc=document.getElementById("pointinc");
-    inc.innerHTML="114 🌞 Coins";
-    var klaim=document.getElementById("claimed");
-    klaim.innerHTML="Claimed";
-    klaim.style.backgroundColor="grey";
-  }
-    return (
+  useEffect(() => {
+    const fetchQuests = async () => {
+      try {
+        const response = await api1.get("/quest");
+        setQuests(response.data);
+      } catch (error) {
+        console.error("Failed to fetch quests", error);
+        toast.error("Could not load quests");
+      }
+    };
+    fetchQuests();
+  }, []);
+
+  const claimQuest = async (questName) => {
+    try {
+      await api1.post("/quest/claim", { quest_name: questName });
+      setQuests(prev =>
+        prev.map(q =>
+          q.quest_name === questName ? { ...q, claimed: true } : q
+        )
+      );
+      toast.success("Quest claimed!");
+    } catch (error) {
+      console.error("Error claiming quest:", error);
+      toast.error("Failed to claim quest");
+    }
+  };
+
+  return (
     <div className="profiles-container">
       <div className="profiles-header">
         <div className="profiles-info">
           <div className="avatar">
-            <img src="images/akkaphoto.jpg"></img>
+            <img src="images/akkaphoto.jpg" alt="Avatar" />
           </div>
           <div className="details">
-            <h1>TreeCanFixMe</h1>
+            <h1>{user?.username || "TreeCanFixMe"}</h1>
             <div className="badges">
-              <div className="badge" id='flash'>Flash Flora 🌲</div>
+              <div className="badge" id="flash">Flash Flora 🌲</div>
               <div className="badge">Intermediate Planter 🌳</div>
             </div>
-            <p>Email: Tree@gmail.com</p>
+            <p>Email: {user?.email || "Tree@gmail.com"}</p>
             <a href="#" className="add-bio">Add Bio</a>
           </div>
         </div>
+
         <div className="points">
-          <h2 id='yourpoint'>YOUR POINTS</h2>
-          <p id="pointinc">{user.points} 🌞 Coins</p>
-          <p>0.2 💊 Carbon Credit</p>
+          <h2 id="yourpoint">YOUR POINTS</h2>
+          <p id="pointinc">{user?.points ?? 0} 🌞 Coins</p>
+          <p>{((user?.points ?? 0) / 500).toFixed(2)} 💊 Carbon Credit</p>
         </div>
       </div>
 
@@ -68,24 +94,29 @@ function Profile() {
       </div>
 
       <div className="quests">
-        <h2 id='quest'>Quests</h2>
+        <h2 id="quest">Quests</h2>
         <p>Note: complete these challenges to get Green currency</p>
-        <div className="quest">
-          <p className="quest-text">1. Plant your first tree</p>
-          <p className="quest-reward">+10 💚 + Flash Flora 🌲</p>
-          <button className="claim-btn" id='claimed' onClick={pointinc}>Claim</button>
-        </div>
-        <div className="quest">
-          <p className="quest-text">2. Plant 3 different Trees</p>
-          <p className="quest-reward">+10 💚 LOCKED</p>
-          <button className="locked-btn" disabled>🔒</button>
-        </div>
-        <div className="quest">
-          <p className="quest-text">3. Post 5 times</p>
-          <p className="quest-reward">+10 💚 LOCKED</p>
-          <button className="locked-btn" disabled>🔒</button>
-        </div>
+
+        {quests.map((q) => (
+          <div className="quest" key={q.quest_name}>
+            <p className="quest-text">{q.quest_name}</p>
+            <p className="quest-reward">
+              {q.completed ? "+10 💚" : "LOCKED"}
+              {q.completed && !q.claimed && " + Reward Available"}
+            </p>
+            <button
+              className={q.claimed ? "locked-btn" : "claim-btn"}
+              onClick={() => claimQuest(q.quest_name)}
+              disabled={!q.completed || q.claimed}
+              style={q.claimed ? { backgroundColor: "grey" } : {}}
+            >
+              {q.claimed ? "Claimed" : q.completed ? "Claim" : "🔒"}
+            </button>
+          </div>
+        ))}
       </div>
+
+      <ToastContainer />
     </div>
   );
 }

@@ -12,20 +12,29 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+      setIsAuthenticated(true);
+    }
+
     const checkAuth = async () => {
       try {
         const response = await api1.get("/auth/checkauth");
         if (response.status === 200) {
-          setIsAuthenticated(true);
           setUser(response.data.user);
+          setIsAuthenticated(true);
+          localStorage.setItem("user", JSON.stringify(response.data.user));
         } else {
-          setIsAuthenticated(false);
           setUser(null);
+          setIsAuthenticated(false);
+          localStorage.removeItem("user");
         }
       } catch (error) {
         console.error("Error checking authentication:", error);
-        setIsAuthenticated(false);
         setUser(null);
+        setIsAuthenticated(false);
+        localStorage.removeItem("user");
       } finally {
         setLoading(false);
       }
@@ -34,7 +43,6 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, []);
 
-  // 🔁 Updated to use email instead of fullname
   const signup = async (email, username, password) => {
     try {
       const response = await api1.post("/auth/signup", {
@@ -46,6 +54,7 @@ export function AuthProvider({ children }) {
       if (response.status === 200) {
         setIsAuthenticated(true);
         setUser(response.data.user);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         navigate("/");
       }
     } catch (error) {
@@ -63,12 +72,14 @@ export function AuthProvider({ children }) {
       if (response.status === 200) {
         setIsAuthenticated(true);
         setUser(response.data.user);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         navigate("/");
       }
     } catch (error) {
       console.error("Error during login:", error);
       setIsAuthenticated(false);
       setUser(null);
+      localStorage.removeItem("user");
     }
   };
 
@@ -78,6 +89,7 @@ export function AuthProvider({ children }) {
       if (response.status === 200) {
         setIsAuthenticated(false);
         setUser(null);
+        localStorage.removeItem("user");
         navigate("/");
       }
     } catch (error) {

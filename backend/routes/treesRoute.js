@@ -5,7 +5,7 @@ import passport from "../utils/passport.js";
 const router = express.Router();
 
 // ✅ Protect routes with session-based auth
-router.post("/uploadtree", uploadtree);
+router.post("/uploadtree", passport.authenticate("session"), uploadtree);
 router.get("/gettree", passport.authenticate("session"), gettree);
 
 export default router;
