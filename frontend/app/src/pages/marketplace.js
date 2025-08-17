@@ -1,16 +1,4 @@
 import React, { useState } from 'react'
-import '../marketplace.css'
-
-// A reusable Card component that accepts props
-function Card({ imgSrc, title, price }) {
-  return (
-    <div className="mcard">
-      <img src={imgSrc} alt={title} />
-      <h3>{title}</h3>
-      <p>Price: {price} CC</p>
-    </div>
-  )
-}
 
 function Marketplace() {
   // Sample data for shop items
@@ -71,61 +59,32 @@ function Marketplace() {
     setActiveLabel('Merch')
   }
   return (
-    <div className="marketplace-container">
-      {/* Nav Bar Placeholder */}
-
-      {/* Claim Section */}
-      <div className="claim-section">
-        <div className="claim-text">
-          <h2>Claim Carbon Certificate</h2>
-          <p>Earn your carbon credit by completing green challenges and supporting eco-friendly activities.</p>
+    <div className="mx-auto max-w-6xl p-6 font-pixel">
+      <div className="mb-8 flex flex-col items-start justify-between gap-6 rounded-xl bg-neutral-200/80 p-6 shadow-lg md:flex-row">
+        <div className="w-full md:w-1/2 space-y-2">
+          <h2 className="text-3xl font-semibold">Claim Carbon Certificate</h2>
+          <p className="text-gray-600">Earn your carbon credit by completing green challenges and supporting eco-friendly activities.</p>
         </div>
-        <div className="claim-action">
-          <img
-            src="https://cdn.venngage.com/template/thumbnail/small/fde6edf1-054f-4f59-8fb3-ba2518e5c866.webp"
-            alt="Carbon Certificate"
-            className="claim-image"
-          />
-          <button className="claim-button">Claim Now</button>
+        <div className="flex w-full flex-col items-end md:w-1/2">
+          <img src="https://cdn.venngage.com/template/thumbnail/small/fde6edf1-054f-4f59-8fb3-ba2518e5c866.webp" alt="Carbon Certificate" className="mb-3 w-40 rounded shadow" />
+          <button className="rounded bg-green-600 px-5 py-2 text-white shadow hover:bg-green-700">Claim Now</button>
         </div>
       </div>
-
-      {/* Shop Items Section */}
-      <div className="shop-section">
-        <h2>Shop Items</h2>
-        {/* Labels */}
-        <div className="shop-labels">
-          <button
-            className={`label-button ${activeLabel === 'Stickers' ? 'active' : ''}`}
-            onClick={convertToStickers}
-          >
-            Stickers
-          </button>
-          <button
-            className={`label-button ${activeLabel === 'Merch' ? 'active' : ''}`}
-            onClick={convertToMerch}
-          >
-            Merch
-          </button>
-          
-          <button
-            className={`label-button ${activeLabel === 'Badges' ? 'active' : ''}`}
-            onClick={convertToBadges}
-          >
-            Badges
-          </button>
-          <button
-            className={`label-button ${activeLabel === 'Assorted' ? 'active' : ''}`}
-            onClick={convertToAssorted}
-          >
-            NFTs
-          </button>
+      <div className="rounded-xl bg-emerald-700 p-6 shadow-lg text-white">
+        <h2 className="inline rounded-md bg-white px-4 py-1 text-2xl font-semibold text-green-900 shadow">Shop Items</h2>
+        <div className="mt-6 mb-4 flex gap-3">
+          <button onClick={convertToStickers} className={`flex-1 rounded-lg px-4 py-2 text-center text-sm font-medium transition ${activeLabel==='Stickers' ? 'bg-green-500 text-white' : 'bg-white/80 text-gray-800 hover:bg-green-400 hover:text-white'}`}>Stickers</button>
+          <button onClick={convertToMerch} className={`flex-1 rounded-lg px-4 py-2 text-center text-sm font-medium transition ${activeLabel==='Merch' ? 'bg-green-500 text-white' : 'bg-white/80 text-gray-800 hover:bg-green-400 hover:text-white'}`}>Merch</button>
+          <button onClick={convertToBadges} className={`flex-1 rounded-lg px-4 py-2 text-center text-sm font-medium transition ${activeLabel==='Badges' ? 'bg-green-500 text-white' : 'bg-white/80 text-gray-800 hover:bg-green-400 hover:text-white'}`}>Badges</button>
+          <button onClick={convertToAssorted} className={`flex-1 rounded-lg px-4 py-2 text-center text-sm font-medium transition ${activeLabel==='Assorted' ? 'bg-green-500 text-white' : 'bg-white/80 text-gray-800 hover:bg-green-400 hover:text-white'}`}>NFTs</button>
         </div>
-
-        {/* Cards */}
-        <div className="shop-cards">
+        <div className="flex h-96 gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none]">
           {shopItems.map((item, index) => (
-            <Card key={index} imgSrc={item.imgSrc} title={item.title} price={item.price} />
+            <div key={index} className="flex h-72 w-52 flex-col items-center rounded-xl bg-white p-3 text-gray-800 shadow">
+              <img src={item.imgSrc} alt={item.title} className="h-48 w-full rounded-lg object-cover" />
+              <h3 className="mt-2 text-sm font-semibold leading-tight">{item.title}</h3>
+              <p className="text-xs text-gray-600">Price: {item.price} CC</p>
+            </div>
           ))}
         </div>
       </div>

@@ -3,65 +3,48 @@ import { AuthContext } from "../contexts/authContext";
 import { useContext, useState } from "react";
 
 function Header() {
-  const { isAuthenticated, user, logout } = useContext(AuthContext);
+  const { isAuthenticated, logout } = useContext(AuthContext);
   const [showPopover, setShowPopover] = useState(false);
 
-  const togglePopover = () => {
-    setShowPopover((prev) => !prev); // Toggle popover visibility
-  };
+  const togglePopover = () => setShowPopover((p) => !p);
+  const handleLogout = () => { logout(); setShowPopover(false); };
 
-  const handleLogout = () => {
-    logout(); // Call the logout function
-    setShowPopover(false); // Hide the popover after logout
-  };
+  const baseBtn = "flex items-center gap-2 font-pixel text-lg text-black transition-transform hover:scale-125";
 
   return (
-    <div className="navbar">
-      
-      <Link to="/"><div className="navbar-component">
-        <img src="images/home.png" alt="Home" />
-        <p>Home</p>
-      </div></Link>
-      <Link to="/tree"><div className="navbar-component">
-        <img src="images/tree.png" alt="My Plants" />
-        <p>MyPlants</p>
-      </div></Link>
-      <Link to="/leaderboard"><div className="navbar-component">
-        <img src="images/trophy.png" alt="Leaderboard" />
-        <p>Leaderboard</p>
-      </div></Link>
-      <Link to="/marketplace"><div className="navbar-component">
-        <img src="images/sun.png" alt="Marketplace" />
-        <p>Marketplace</p>
-      </div></Link>
-
+    <nav className="mx-auto mt-4 mb-8 w-11/12 max-w-5xl rounded-3xl bg-amber-300/80 backdrop-blur shadow-lg shadow-black/30 px-6 py-3 flex justify-around items-center">
+      <Link to="/" className={baseBtn}>
+        <img src="images/home.png" alt="Home" className="size-9" />
+        <span>Home</span>
+      </Link>
+      <Link to="/tree" className={baseBtn}>
+        <img src="images/tree.png" alt="My Plants" className="size-9" />
+        <span>MyPlants</span>
+      </Link>
+      <Link to="/leaderboard" className={baseBtn}>
+        <img src="images/trophy.png" alt="Leaderboard" className="size-9" />
+        <span>Leaderboard</span>
+      </Link>
+      <Link to="/marketplace" className={baseBtn}>
+        <img src="images/sun.png" alt="Marketplace" className="size-9" />
+        <span>Marketplace</span>
+      </Link>
       {!isAuthenticated ? (
-        <Link to="/login">
-          <div className="navbar-component">
-            <p>Login/Signup</p>
-          </div>
-        </Link>
+        <Link to="/login" className={baseBtn}>Login/Signup</Link>
       ) : (
-        <Link to="/profile"><div className="navbar-component profile-container">
-          <img
-            src="images/person.png"
-            alt="Profile"
-            onClick={togglePopover}
-            style={{ cursor: "pointer" }}
-          />
-          <p onClick={togglePopover} style={{ cursor: "pointer" }}>
-            Profile
-          </p>
+        <div className="relative">
+          <button onClick={togglePopover} className={baseBtn + " focus:outline-none"}>
+            <img src="images/person.png" alt="Profile" className="size-9" />
+            <span>Profile</span>
+          </button>
           {showPopover && (
-            <div className="popover">
-              <button className="popbutton" onClick={handleLogout}>Logout</button>
+            <div className="absolute right-0 mt-2 w-40 rounded-md border border-black bg-white p-2 shadow-xl">
+              <button onClick={handleLogout} className="w-full rounded bg-black px-3 py-2 text-white text-sm font-medium hover:bg-neutral-800">Logout</button>
             </div>
           )}
         </div>
-        </Link>
       )}
-    </div>
-    
+    </nav>
   );
 }
 

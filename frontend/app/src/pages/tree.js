@@ -29,42 +29,40 @@ export default function Tree() {
     const handleCloseUploader = () => setShowUploader(false);
 
     return (
-        <div>
-            <div className="plantadd">
-                <div>Myplants</div>
-                <div onClick={handleAddClick} className="plantaddbutton">+Add</div>
-            </div>
+                <div className="font-pixel px-6 py-4">
+                    <div className="mb-6 flex items-center gap-6 text-4xl font-extrabold">
+                        <span>My Plants</span>
+                        <button onClick={handleAddClick} className="rounded-full bg-black px-6 py-2 text-2xl text-white shadow hover:bg-neutral-800">+ Add</button>
+                    </div>
 
-            {showUploader && (
-                <div className="popup-overlay">
-                    <div className="popup-content">
-                        <TreeUploader />
-                        <button className="close-button" onClick={handleCloseUploader}>Close</button>
+                    {showUploader && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                            <div className="max-h-[80vh] w-11/12 max-w-xl overflow-y-auto rounded-xl border-4 border-black bg-white p-6">
+                                <TreeUploader />
+                                <button onClick={handleCloseUploader} className="mt-4 w-full rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600">Close</button>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="mx-auto w-full rounded-3xl border-4 border-black bg-white p-6">
+                        <div className="mb-6 text-3xl">Your garden 🏡 | Chennai</div>
+                        <div className="flex flex-wrap justify-around gap-8">
+                            {trees.length > 0 ? (
+                                trees.map((tree) => (
+                                    <Treecard
+                                        key={tree.tid}
+                                        imageurl={tree.imageurl}
+                                        treename={tree.treename}
+                                        species={tree.species}
+                                        date={new Date(tree.date).toLocaleDateString()}
+                                        co2={tree.co2_intake}
+                                    />
+                                ))
+                            ) : (
+                                <p className="text-3xl">Plant Trees to reduce CO₂ and earn</p>
+                            )}
+                        </div>
                     </div>
                 </div>
-            )}
-
-            <div className="outercon">
-                <div className="innercon">
-                    <div className="garden">Your garden🏡 | Chennai</div>
-                    <div className="treecon">
-                        {trees.length > 0 ? (
-                            trees.map((tree) => (
-                                <Treecard
-                                    key={tree.tid}
-                                    imageurl={tree.imageurl}
-                                    treename={tree.treename}
-                                    species={tree.species}
-                                    date={new Date(tree.date).toLocaleDateString()}
-                                    co2={tree.co2_intake}
-                                />
-                            ))
-                        ) : (
-                            <p style={{ fontSize: "40px" }}>Plant Trees to reduce CO₂ and earn</p>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
     );
 }
