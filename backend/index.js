@@ -1,21 +1,29 @@
 import express from "express";
 import session from "express-session";
 import cors from "cors";
+import helmet from "helmet";
 import passport from "./utils/passport.js";
 import dotenv from 'dotenv';
+import { generalRateLimit } from './middleware/validation.js';
 dotenv.config();
-
 import authRoute from "./routes/authRoute.js";
 import treeRoute from "./routes/treesRoute.js";
 import imageRoute from "./routes/imageRoute.js";
-
 const app = express();
-
-// ✅ Accept JSON
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true }));
-
-// ✅ Configure CORS and session
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:", "http:"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'", "http://localhost:*", "https://*"]
+    }
+  }
+}));
+app.use(generalRateLimit);
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:3000').split(/[,\s]+/);
 app.use(cors({
   origin: (origin, cb) => {
@@ -24,8 +32,6 @@ app.use(cors({
   },
   credentials: true
 }));
-
-// ✅ Secure session configuration
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -35,21 +41,15 @@ app.use(
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000
     },
   })
 );
-
-// ✅ Passport session setup
 app.use(passport.initialize());
 app.use(passport.session());
-
-// ✅ Routes
 app.use("/auth", authRoute);
 app.use("/tree", treeRoute);
 app.use("/upload", imageRoute);
-
-// ✅ Start server
 app.listen(4000, () => {
   console.log("Server running on http://localhost:4000");
 });
