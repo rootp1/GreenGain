@@ -3,11 +3,9 @@ import { AuthContext } from "../contexts/authContext";
 import { api1 } from "../services/api";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
 function Profile() {
   const { user } = useContext(AuthContext);
   const [quests, setQuests] = useState([]);
-
   useEffect(() => {
     const fetchQuests = async () => {
       try {
@@ -20,7 +18,6 @@ function Profile() {
     };
     fetchQuests();
   }, []);
-
   const claimQuest = async (questName) => {
     try {
       await api1.post("/quest/claim", { quest_name: questName });
@@ -35,7 +32,6 @@ function Profile() {
       toast.error("Failed to claim quest");
     }
   };
-
   return (
     <div className="mx-auto max-w-5xl font-pixel p-4">
       {/* Header */}
@@ -60,7 +56,6 @@ function Profile() {
             <p className="text-sm">{((user?.points ?? 0) / 500).toFixed(2)} 💊 Carbon Credit</p>
         </div>
       </div>
-
       {/* Transactions */}
       <div className="mb-6 rounded-2xl bg-neutral-200 p-6 shadow">
         <h2 className="mb-4 inline rounded-lg bg-white px-3 py-1 text-xl">Transaction History</h2>
@@ -94,7 +89,6 @@ function Profile() {
           </table>
         </div>
       </div>
-
       {/* Quests */}
       <div className="rounded-2xl bg-emerald-700 p-6 text-white shadow">
         <h2 className="mb-2 inline rounded bg-white px-3 py-1 text-xl font-semibold text-black">Quests</h2>
@@ -122,5 +116,4 @@ function Profile() {
     </div>
   );
 }
-
 export default Profile;

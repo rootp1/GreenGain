@@ -1,7 +1,6 @@
 import React, { useContext} from "react";
 import HomePost from "../components/homepost";
 import { AuthContext } from "../contexts/authContext";
-
 function Home() {
   const { isAuthenticated, user } = useContext(AuthContext);
   return (
@@ -30,5 +29,4 @@ function Home() {
     </div>
   );
 }
-
 export default Home;

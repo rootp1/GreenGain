@@ -1,5 +1,4 @@
 import React from "react";
-
 export default function Treecard(props) {
     return (
         <div className="flex h-64 w-64 flex-col items-center justify-center rounded-2xl border-4 border-black bg-white p-3 shadow">

@@ -5,7 +5,6 @@ import { api1 } from '../services/api';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Popover from './popover';
-
 export default function TreeUploader() {
   const [image, setImage] = useState(null);
   const [imageName, setImageName] = useState("");
@@ -18,7 +17,6 @@ export default function TreeUploader() {
   const [soilType, setSoilType] = useState("");
   const [description, setDescription] = useState("");
   const [showPopover, setShowPopover] = useState(false);
-
   const handleImageUpload = async () => {
     if (!image) {
       toast.error('Please select an image!');
@@ -45,7 +43,6 @@ export default function TreeUploader() {
       toast.error('Failed to compress image!');
     }
   };
-
   useEffect(() => {
     if (imageUrl) {
       (async () => {
@@ -56,7 +53,6 @@ export default function TreeUploader() {
           } else {
             setSpecies(prediction);
           }
-
           if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
               (position) => {
@@ -78,7 +74,6 @@ export default function TreeUploader() {
       })();
     }
   }, [imageUrl]);
-
   const handleDataSubmit = async () => {
     const treeData = {
       species,
@@ -90,7 +85,6 @@ export default function TreeUploader() {
       description,
       imageUrl,
     };
-
     try {
       const response = await api1.post("/tree/uploadtree", treeData);
       toast.success("Data submitted successfully!");
@@ -103,11 +97,9 @@ export default function TreeUploader() {
       toast.error("Failed to submit tree data!");
     }
   };
-
   return (
     <div className="mx-auto max-w-3xl space-y-8 rounded-2xl bg-white/90 p-6 text-black shadow backdrop-blur">
       <h1 className="text-center text-3xl font-bold">Upload the Initial Tree Sapling</h1>
-
       {/* Image Upload Section */}
       <div className="rounded-xl border border-dashed border-green-500 bg-green-50 p-5">
         <div className="flex flex-col items-center gap-4 md:flex-row md:items-end">
@@ -140,7 +132,6 @@ export default function TreeUploader() {
           </div>
         )}
       </div>
-
       {/* Prediction + Location */}
       {(species || location) && (
         <div className="grid gap-4 md:grid-cols-2">
@@ -166,11 +157,9 @@ export default function TreeUploader() {
           )}
         </div>
       )}
-
       {showPopover && species && (
         <Popover species={species} onClose={() => setShowPopover(false)} />
       )}
-
       {/* Metadata Form */}
       {location && species && (
         <div className="rounded-2xl bg-neutral-100 p-6 shadow">
@@ -205,5 +194,4 @@ export default function TreeUploader() {
       <ToastContainer />
     </div>
   );
-
 }

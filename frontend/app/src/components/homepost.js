@@ -19,5 +19,4 @@ function HomePost(props){
     </div>
   );
 }
-
 export default HomePost

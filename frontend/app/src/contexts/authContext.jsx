@@ -1,22 +1,18 @@
 import { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api1 } from "../services/api";
-
 export const AuthContext = createContext();
-
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
       setUser(JSON.parse(savedUser));
       setIsAuthenticated(true);
     }
-
     const checkAuth = async () => {
       try {
         const response = await api1.get("/auth/checkauth");
@@ -38,10 +34,8 @@ export function AuthProvider({ children }) {
         setLoading(false);
       }
     };
-
     checkAuth();
   }, []);
-
   const signup = async (email, username, password) => {
     try {
       const response = await api1.post("/auth/signup", {
@@ -49,7 +43,6 @@ export function AuthProvider({ children }) {
         username,
         password,
       });
-
       if (response.status === 200) {
         setIsAuthenticated(true);
         setUser(response.data.user);
@@ -60,14 +53,12 @@ export function AuthProvider({ children }) {
       console.error("Error during signup:", error);
     }
   };
-
   const login = async (username, password) => {
     try {
       const response = await api1.post("/auth/login", {
         username,
         password,
       });
-
       if (response.status === 200) {
         setIsAuthenticated(true);
         setUser(response.data.user);
@@ -81,7 +72,6 @@ export function AuthProvider({ children }) {
       localStorage.removeItem("user");
     }
   };
-
   const logout = async () => {
     try {
       const response = await api1.post("/auth/logout");
@@ -95,7 +85,6 @@ export function AuthProvider({ children }) {
       console.error("Error during logout:", error);
     }
   };
-
   return (
     <AuthContext.Provider
       value={{ isAuthenticated, user, loading, signup, login, logout }}

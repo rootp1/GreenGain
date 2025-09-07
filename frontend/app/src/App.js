@@ -9,14 +9,11 @@ import Leaderboard from "./pages/leaderboard.js";
 import Tree from "./pages/tree.js";
 import Marketplace from "./pages/marketplace.js";
 import Profile from "./pages/profile.js";
-
 function App() {
   const location = useLocation();
   const hideHeaderRoutes = ["/signup", "/login"]; 
-
   return (
     <>
-      
       <AuthProvider>
         {!hideHeaderRoutes.includes(location.pathname) && <Header />}
         <Routes>
@@ -27,13 +24,9 @@ function App() {
           <Route path="/tree" element={<Tree />} />
           <Route path="/marketplace" element={<Marketplace/>} />
           <Route path="/profile" element={<Profile/>} />
-          
-
         </Routes>
       </AuthProvider>
-     
     </>
   );
 }
-
 export default App;

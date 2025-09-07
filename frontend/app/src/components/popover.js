@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-
 const Popover = ({ species, onClose }) => {
     const [error, setError] = useState("");
-
-    // Generate Wolfram Alpha URL for the species
     const getWolframImageUrl = (species) => {
         if (!species) return "";
         const formattedSpecies = species.split(" ").join("+");
         return `http://api.wolframalpha.com/v1/simple?appid=9QJ52J-AWQ26Q4U9X&i=${formattedSpecies}%3F`;
     };
-
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
                 <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl ring-1 ring-black/10">
@@ -38,5 +34,4 @@ const Popover = ({ species, onClose }) => {
             </div>
         );
 };
-
 export default Popover;

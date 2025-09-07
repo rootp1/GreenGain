@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { AuthContext } from "../contexts/authContext";
 import { useContext } from "react";
-
 function Signin() {
   const { login } = useContext(AuthContext);
   const [inputs, setInputs] = useState({});
@@ -9,7 +8,6 @@ function Signin() {
     const name = event.target.name;
     const value = event.target.value;
     setInputs((values) => ({ ...values, [name]: value }));
-    
   };
   return (
     <div className="flex min-h-screen font-pixel">
@@ -31,5 +29,4 @@ function Signin() {
     </div>
   );
 }
-
 export default Signin;

@@ -1,16 +1,13 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../contexts/authContext";
-
 function Signup() {
   const { signup } = useContext(AuthContext);
   const [inputs, setInputs] = useState({});
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     setInputs((prev) => ({ ...prev, [name]: value }));
     console.log(name); // Optional for debugging
   };
-
   return (
     <div className="flex min-h-screen font-pixel">
       <div className="hidden md:flex flex-1 flex-col gap-6 bg-gradient-to-b from-cyan-300 to-fuchsia-300 p-10">
@@ -33,5 +30,4 @@ function Signup() {
     </div>
   );
 }
-
 export default Signup;

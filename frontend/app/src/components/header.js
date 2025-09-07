@@ -1,16 +1,12 @@
 import { Link } from "react-router-dom";
 import { AuthContext } from "../contexts/authContext";
 import { useContext, useState } from "react";
-
 function Header() {
   const { isAuthenticated, logout } = useContext(AuthContext);
   const [showPopover, setShowPopover] = useState(false);
-
   const togglePopover = () => setShowPopover((p) => !p);
   const handleLogout = () => { logout(); setShowPopover(false); };
-
   const baseBtn = "flex items-center gap-2 font-pixel text-lg text-black transition-transform hover:scale-125";
-
   return (
     <nav className="mx-auto mt-4 mb-8 w-11/12 max-w-5xl rounded-3xl bg-amber-300/80 backdrop-blur shadow-lg shadow-black/30 px-6 py-3 flex justify-around items-center">
       <Link to="/" className={baseBtn}>
@@ -47,5 +43,4 @@ function Header() {
     </nav>
   );
 }
-
 export default Header;
