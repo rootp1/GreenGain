@@ -3,6 +3,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../../../components/AuthProvider';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Button, Card, Input } from '../../../components/ui';
 
 export default function LoginPage(){
   const { login, loading, error, isAuthenticated } = useContext(AuthContext);
@@ -24,16 +25,35 @@ export default function LoginPage(){
         <h2 className="text-4xl font-light text-black animate-pulse">Platform for Personal Carbon Credits.</h2>
       </div>
       <div className="flex flex-1 items-center justify-center bg-white p-6">
-        <div className="w-full max-w-md rounded-xl bg-gradient-to-b from-lime-100 to-zinc-200 p-8 shadow-lg">
+        <Card variant="default" padding="large" className="w-full max-w-md bg-gradient-to-b from-lime-100 to-zinc-200">
           <h2 className="mb-6 text-center text-3xl">Sign In</h2>
-          <label className="mb-1 block text-lg font-bold" htmlFor="username">Name</label>
-          <input name="username" type="text" value={inputs.username||''} onChange={handleChange} className="mb-4 w-full rounded border border-gray-300 px-3 py-2 focus:border-black focus:outline-none" />
-          <label className="mb-1 block text-lg font-bold" htmlFor="password">Password</label>
-          <input name="password" type="password" value={inputs.password||''} onChange={handleChange} className="mb-6 w-full rounded border border-gray-300 px-3 py-2 focus:border-black focus:outline-none" />
+          <Input 
+            name="username" 
+            type="text" 
+            label="Name"
+            value={inputs.username||''} 
+            onChange={handleChange} 
+            className="mb-4" 
+          />
+          <Input 
+            name="password" 
+            type="password" 
+            label="Password"
+            value={inputs.password||''} 
+            onChange={handleChange} 
+            className="mb-6" 
+          />
           {error && <div className="mb-3 rounded bg-red-100 px-3 py-2 text-sm text-red-700">{error}</div>}
-          <button disabled={submitting} className="w-full rounded bg-black px-4 py-3 text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60" onClick={submit}>{submitting? 'Signing in...' : 'Sign In'}</button>
-          <p className="mt-4 text-center text-sm">Don't have an account? <Link href="/signup" className="font-bold text-blue-600">Sign Up!</Link></p>
-        </div>
+          <Button 
+            onClick={submit}
+            disabled={submitting}
+            size="full"
+            className="mb-4"
+          >
+            {submitting? 'Signing in...' : 'Sign In'}
+          </Button>
+          <p className="text-center text-sm">Don't have an account? <Link href="/signup" className="font-bold text-blue-600">Sign Up!</Link></p>
+        </Card>
       </div>
     </div>
   );
