@@ -25,16 +25,17 @@ app.use(cors({
   credentials: true
 }));
 
-// ✅ Basic dev memory session store
+// ✅ Secure session configuration
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'dev_secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      sameSite: 'lax'
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     },
   })
 );
