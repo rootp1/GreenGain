@@ -2,6 +2,8 @@ import express from "express";
 import session from "express-session";
 import cors from "cors";
 import passport from "./utils/passport.js";
+import dotenv from 'dotenv';
+dotenv.config();
 
 import authRoute from "./routes/authRoute.js";
 import treeRoute from "./routes/treesRoute.js";
@@ -14,20 +16,25 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // ✅ Configure CORS and session
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:3000').split(/[,\s]+/);
 app.use(cors({
-  origin: "https://greengain.onrender.com/",
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error('CORS blocked for origin ' + origin));
+  },
   credentials: true
 }));
 
 // ✅ Basic dev memory session store
 app.use(
   session({
-    secret: "secret",
+    secret: process.env.SESSION_SECRET || 'dev_secret',
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,      // true in production with HTTPS
+      secure: false,
       httpOnly: true,
+      sameSite: 'lax'
     },
   })
 );

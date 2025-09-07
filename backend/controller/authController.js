@@ -99,3 +99,35 @@ export const checkauth = (req, res) => {
     return res.status(401).json({ authenticated: false, message: "User is not authenticated" });
   }
 };
+
+export const updateProfile = async (req, res) => {
+  if(!req.isAuthenticated()) return res.status(401).json({ message: 'Not authenticated' });
+  const userId = req.user.id;
+  const { username } = req.body;
+  if(!username || typeof username !== 'string' || !username.trim()) return res.status(400).json({ message: 'Username required' });
+  const newName = username.trim();
+  try {
+    // check if taken by another user
+    const existing = await supabase.from('users').select('id').eq('username', newName).neq('id', userId);
+    if(existing.error){
+      console.error('Username check error', existing.error);
+      return res.status(500).json({ message: 'Username check failed' });
+    }
+    if(existing.data && existing.data.length) return res.status(409).json({ message: 'Username already taken' });
+    const upd = await supabase.from('users').update({ username: newName }).eq('id', userId).select().single();
+    if(upd.error){
+      console.error('Update error', upd.error);
+      return res.status(500).json({ message: 'Failed to update profile' });
+    }
+    // reserialize updated user into session
+    req.login(upd.data, (err)=>{
+      if(err){
+        console.error('Re-login error', err);
+      }
+      return res.status(200).json({ message: 'Profile updated', user: upd.data });
+    });
+  } catch (e) {
+    console.error('updateProfile exception', e);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};

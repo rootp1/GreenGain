@@ -6,9 +6,9 @@ export default function LayoutClient({ children }) {
   const pathname = usePathname();
   const hideHeader = pathname?.startsWith('/login') || pathname?.startsWith('/signup');
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
+    <div className="flex min-h-screen flex-col">
       {!hideHeader && <Header />}
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1">
         {children}
       </main>
     </div>

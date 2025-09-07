@@ -4,10 +4,8 @@ from model import load_model, predict_species, get_label_names
 
 app = Flask(__name__)
 
-# Only allow requests from your deployed frontend
-CORS(app, origins=["https://greengain.onrender.com"])
+CORS(app, origins=["https://greengain.onrender.com", "http://localhost:3000"])
 
-# Load model once
 model = load_model()
 label_names = get_label_names()
 
@@ -16,7 +14,6 @@ def predict():
     image_url = request.args.get('url')
     if not image_url:
         return jsonify({'error': 'URL parameter is missing'}), 400
-
     try:
         predicted_species = predict_species(model, image_url, label_names)
         return jsonify({'species': predicted_species})
@@ -24,4 +21,5 @@ def predict():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Run only on localhost (loopback) at port 5000
+    app.run(host='127.0.0.1', port=5000, debug=True)

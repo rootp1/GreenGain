@@ -1,12 +1,22 @@
 "use client";
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../../../components/AuthProvider';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage(){
-  const { login } = useContext(AuthContext);
+  const { login, loading, error, isAuthenticated } = useContext(AuthContext);
+  const router = useRouter();
   const [inputs,setInputs]=useState({});
+  const [submitting,setSubmitting]=useState(false);
   const handleChange=e=> setInputs(v=>({...v,[e.target.name]:e.target.value}));
+  const submit = async ()=>{
+    setSubmitting(true);
+    const res = await login(inputs.username, inputs.password);
+    setSubmitting(false);
+    if(res.ok) router.replace('/');
+  };
+  useEffect(()=>{ if(!loading && isAuthenticated) router.replace('/'); },[loading,isAuthenticated,router]);
   return (
     <div className="flex min-h-screen font-pixel">
       <div className="hidden md:flex flex-1 flex-col gap-6 bg-gradient-to-b from-cyan-300 to-fuchsia-300 p-10 justify-start">
@@ -20,7 +30,8 @@ export default function LoginPage(){
           <input name="username" type="text" value={inputs.username||''} onChange={handleChange} className="mb-4 w-full rounded border border-gray-300 px-3 py-2 focus:border-black focus:outline-none" />
           <label className="mb-1 block text-lg font-bold" htmlFor="password">Password</label>
           <input name="password" type="password" value={inputs.password||''} onChange={handleChange} className="mb-6 w-full rounded border border-gray-300 px-3 py-2 focus:border-black focus:outline-none" />
-          <button className="w-full rounded bg-black px-4 py-3 text-white transition hover:bg-neutral-800" onClick={()=>login(inputs.username, inputs.password)}>Sign In</button>
+          {error && <div className="mb-3 rounded bg-red-100 px-3 py-2 text-sm text-red-700">{error}</div>}
+          <button disabled={submitting} className="w-full rounded bg-black px-4 py-3 text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60" onClick={submit}>{submitting? 'Signing in...' : 'Sign In'}</button>
           <p className="mt-4 text-center text-sm">Don't have an account? <Link href="/signup" className="font-bold text-blue-600">Sign Up!</Link></p>
         </div>
       </div>

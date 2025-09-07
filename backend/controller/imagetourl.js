@@ -2,8 +2,6 @@ import axios from "axios";
 import dotenv from "dotenv";
 dotenv.config();
 
-console.log("IMGBB_API_KEY:", process.env.IMGBB_API_KEY);
-
 export const uploadimage = async (req, res) => {
   const { file, fileName } = req.body;
 

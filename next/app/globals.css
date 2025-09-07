@@ -9,6 +9,7 @@
 body.app-body {
 	@apply min-h-screen bg-cover bg-center bg-no-repeat m-0;
 	background-image: var(--bg-image);
+	background-attachment: fixed; /* keep background static while content scrolls */
 	font-family: var(--font-pixel), sans-serif;
 }
 

@@ -1,11 +1,15 @@
 "use client";
 import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../../components/AuthProvider';
+import Protected from '../../../components/Protected';
 import { toast } from 'react-toastify';
 import { api1 } from '../../../components/api';
 
 export default function Profile(){
-  const { user } = useContext(AuthContext);
+  const { user, refresh } = useContext(AuthContext);
+  const [newName,setNewName]=useState('');
+  const [updating,setUpdating]=useState(false);
+  const [updateMsg,setUpdateMsg]=useState(null);
   const [quests,setQuests]=useState([]);
   const [loading,setLoading]=useState(true);
   useEffect(()=>{
@@ -16,10 +20,25 @@ export default function Profile(){
   const claimQuest = async (name)=>{
     try{ await api1.post('/quest/claim',{ quest_name:name }); setQuests(q=> q.map(x=> x.quest_name===name? {...x, claimed:true}: x)); toast.success('Quest claimed!'); }catch(e){ toast.error('Failed to claim quest'); }
   };
-  if(!user) return <div className="p-8 font-pixel">Login required</div>;
+  const doUpdate = async ()=>{
+    if(!newName.trim()) return;
+    setUpdating(true); setUpdateMsg(null);
+    try {
+      await api1.post('/auth/update',{ username:newName.trim() }, { withCredentials:true });
+      setUpdateMsg('Updated successfully');
+      setNewName('');
+      refresh && refresh();
+    } catch(e){
+      setUpdateMsg(e.response?.data?.message || 'Update failed');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   return (
+    <Protected>
     <div className="mx-auto max-w-5xl font-pixel p-4">
-      <div className="mb-6 flex flex-col justify-between gap-6 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-300 p-6 text-black shadow md:flex-row">
+  <div className="mb-6 flex flex-col justify-between gap-6 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-300 p-6 text-black shadow md:flex-row">
         <div className="flex items-center gap-6">
           <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-white bg-neutral-200" />
           <div>
@@ -31,10 +50,20 @@ export default function Profile(){
             <p className="mt-2 text-sm">Email: {user?.email || 'user@example.com'}</p>
           </div>
         </div>
-        <div className="rounded-2xl bg-white p-5 shadow-inner">
-          <h2 className="mb-2 text-xl font-semibold underline decoration-orange-400">YOUR POINTS</h2>
-          <p className="text-lg font-medium">{user?.points ?? 0} 🌞 Coins</p>
-          <p className="text-sm">{((user?.points ?? 0) / 500).toFixed(2)} 💊 Carbon Credit</p>
+        <div className="flex flex-col gap-4">
+          <div className="rounded-2xl bg-white p-5 shadow-inner">
+            <h2 className="mb-2 text-xl font-semibold underline decoration-orange-400">YOUR POINTS</h2>
+            <p className="text-lg font-medium">{user?.points ?? 0} 🌞 Coins</p>
+            <p className="text-sm">{((user?.points ?? 0) / 500).toFixed(2)} 💊 Carbon Credit</p>
+          </div>
+          <div className="rounded-2xl bg-white p-5 shadow-inner">
+            <h2 className="mb-3 text-lg font-semibold">Update Name</h2>
+            <div className="flex gap-2">
+              <input value={newName} onChange={e=>setNewName(e.target.value)} placeholder="New username" className="flex-1 rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-300" />
+              <button onClick={doUpdate} disabled={!newName.trim()||updating} className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-400 hover:bg-green-700">{updating? 'Saving...' : 'Save'}</button>
+            </div>
+            {updateMsg && <p className="mt-2 text-xs text-neutral-700">{updateMsg}</p>}
+          </div>
         </div>
       </div>
       <div className="mb-6 rounded-2xl bg-neutral-200 p-6 shadow">
@@ -65,5 +94,6 @@ export default function Profile(){
         )}
       </div>
     </div>
+    </Protected>
   );
 }
