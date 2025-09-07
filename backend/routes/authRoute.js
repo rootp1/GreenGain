@@ -1,12 +1,16 @@
 import express from "express";
-const router =express.Router();
-import { signup,login,logout,checkauth, updateProfile} from "../controller/authController.js";
-
-
-router.post("/signup",signup);
-router.post("/login",login);
-router.post("/logout",logout);
-router.get("/checkauth",checkauth);
-router.post("/update", updateProfile);
-
+import { signup, login, logout, checkauth, updateProfile } from "../controller/authController.js";
+import { 
+  authRateLimit, 
+  validateSignupInput, 
+  validateLoginInput, 
+  validateProfileUpdate 
+} from "../middleware/validation.js";
+const router = express.Router();
+router.use(authRateLimit);
+router.post("/signup", validateSignupInput, signup);
+router.post("/login", validateLoginInput, login);
+router.post("/logout", logout);
+router.get("/checkauth", checkauth);
+router.post("/update", validateProfileUpdate, updateProfile);
 export default router;
