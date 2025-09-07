@@ -1,11 +1,13 @@
 import express from "express";
 import { uploadtree, gettree } from "../controller/uploadController.js";
-import passport from "../utils/passport.js";
-
+import { validateTreeInput } from "../middleware/validation.js";
 const router = express.Router();
-
-// ✅ Protect routes with session-based auth
-router.post("/uploadtree", passport.authenticate("session"), uploadtree);
-router.get("/gettree", passport.authenticate("session"), gettree);
-
+const requireAuth = (req, res, next) => {
+  if (!req.isAuthenticated() || !req.user) {
+    return res.status(401).json({ message: "Authentication required" });
+  }
+  next();
+};
+router.post("/", validateTreeInput, requireAuth, uploadtree);
+router.get("/gettree", requireAuth, gettree);
 export default router;
