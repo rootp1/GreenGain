@@ -25,7 +25,7 @@ export const uploadimage = async (req, res) => {
     formData.append("image", file);
     formData.append("name", sanitizedFileName);
     const response = await axios.post(
-      `https:
+      `https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`,
       formData.toString(),
       {
         headers: {
