@@ -28,9 +28,5 @@ def predict():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    # Get configuration from environment variables
-    host = os.getenv('FLASK_HOST', '127.0.0.1')
-    port = int(os.getenv('FLASK_PORT', 5000))
-    debug = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
-    
-    app.run(host=host, port=port, debug=debug)
+    # Run only on localhost (loopback) at port 5000
+    app.run(host='127.0.0.1', port=5000, debug=True)
