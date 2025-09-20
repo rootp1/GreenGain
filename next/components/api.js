@@ -6,6 +6,23 @@ export const api1 = axios.create({
 	withCredentials: true,
 });
 
+// Add response interceptor to handle authentication errors
+api1.interceptors.response.use(
+	(response) => response,
+	async (error) => {
+		if (error.response?.status === 401) {
+			// Log the authentication failure for debugging
+			console.error('Authentication failed:', {
+				url: error.config?.url,
+				method: error.config?.method,
+				status: error.response?.status,
+				data: error.response?.data
+			});
+		}
+		return Promise.reject(error);
+	}
+);
+
 export const api2 = axios.create({
 	baseURL: process.env.NEXT_PUBLIC_ML_MODEL_URL || 'http://localhost:5000',
 	headers: { 'Content-Type': 'application/json' },

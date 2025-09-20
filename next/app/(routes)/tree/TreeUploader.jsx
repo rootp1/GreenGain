@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../../../components/AuthProvider';
 import { predictSpecies, api1 } from '../../../components/api';
 import { toast } from 'react-toastify';
 import Popover from '../../../components/Popover';
@@ -9,6 +10,7 @@ import { MESSAGES, IMAGES } from '../../../lib/constants';
 import { handleApiError, generateSafeFilename, formatLocation, processImageFile } from '../../../lib/utils';
 
 export default function TreeUploader() {
+  const { isAuthenticated, user, loading, refresh } = useContext(AuthContext);
   const [image, setImage] = useState(null);
   const [imageName, setImageName] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -40,6 +42,13 @@ export default function TreeUploader() {
       toast.error(MESSAGES.ERROR_NO_IMAGE);
       return;
     }
+
+    // Check authentication before upload
+    if (!isAuthenticated || !user) {
+      toast.error('Please log in to upload images');
+      return;
+    }
+
     try {
       const { base64, compressedFile } = await processImageFile(image);
       const safeName = generateSafeFilename(image.name);
@@ -56,7 +65,22 @@ export default function TreeUploader() {
       toast.success(MESSAGES.SUCCESS_UPLOAD);
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast.error(handleApiError(error, MESSAGES.ERROR_UPLOAD));
+      
+      // Handle specific error cases
+      if (error.response?.status === 401) {
+        toast.error('Authentication failed. Refreshing session...');
+        // Try to refresh the session
+        try {
+          await refresh();
+          toast.info('Session refreshed. Please try uploading again.');
+        } catch (refreshError) {
+          toast.error('Please log in again.');
+        }
+      } else if (error.response?.status === 413) {
+        toast.error('Image file is too large. Please select a smaller image.');
+      } else {
+        toast.error(handleApiError(error, MESSAGES.ERROR_UPLOAD));
+      }
     }
   };
 
@@ -92,6 +116,12 @@ export default function TreeUploader() {
   useEffect(() => { fetchTrees(); }, []);
 
   const handleDataSubmit = async () => {
+    // Check authentication before submission
+    if (!isAuthenticated || !user) {
+      toast.error('Please log in to submit tree data');
+      return;
+    }
+
     try {
       await api1.post('/tree', {
         treeName, species, climate, soilType, description, date,
@@ -104,13 +134,56 @@ export default function TreeUploader() {
       fetchTrees();
     } catch (error) {
       console.error('Error submitting data:', error);
-      toast.error(handleApiError(error, MESSAGES.ERROR_SUBMIT));
+      
+      // Handle specific error cases
+      if (error.response?.status === 401) {
+        toast.error('Authentication failed. Refreshing session...');
+        // Try to refresh the session
+        try {
+          await refresh();
+          toast.info('Session refreshed. Please try submitting again.');
+        } catch (refreshError) {
+          toast.error('Please log in again.');
+        }
+      } else {
+        toast.error(handleApiError(error, MESSAGES.ERROR_SUBMIT));
+      }
     }
   };
 
   return (
     <Card variant="default" padding="large" className="mx-auto max-w-5xl space-y-10 bg-white/90 text-black backdrop-blur">
       <h1 className="text-center text-3xl font-bold">Upload the Initial Tree Sapling</h1>
+      
+      {/* Authentication status */}
+      {loading ? (
+        <div className="text-center">
+          <Loading />
+          <p className="mt-2 text-gray-600">Checking authentication...</p>
+        </div>
+      ) : !isAuthenticated ? (
+        <div className="text-center bg-yellow-100 border border-yellow-400 rounded-lg p-4">
+          <p className="text-yellow-800">⚠️ Please log in to upload trees and images</p>
+          <Button 
+            onClick={refresh} 
+            size="small" 
+            className="mt-2"
+          >
+            Refresh Auth Status
+          </Button>
+        </div>
+      ) : (
+        <div className="text-center bg-green-100 border border-green-400 rounded-lg p-2">
+          <p className="text-green-800 text-sm">✅ Authenticated as {user?.username}</p>
+          <Button 
+            onClick={refresh} 
+            size="small" 
+            className="mt-1 text-xs"
+          >
+            Refresh
+          </Button>
+        </div>
+      )}
       
       {/* Image Upload Section */}
       <Card variant="green" padding="medium" className="border-dashed border-green-500">
