@@ -32,7 +32,7 @@ app.use(helmet({
 app.use(generalRateLimit);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-const allowedOrigins = (process.env.CORS_ORIGINS || 'https://green-gain.vercel.app/' || '').split(/[,\s]+/);
+const allowedOrigins = (process.env.CORS_ORIGINS || 'https://green-gain.vercel.app' ).split(/[,\s]+/);
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
