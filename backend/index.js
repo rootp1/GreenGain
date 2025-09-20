@@ -18,8 +18,9 @@ import authRoute from "./routes/authRoute.js";
 import treeRoute from "./routes/treesRoute.js";
 import imageRoute from "./routes/imageRoute.js";
 
-app.set('trust proxy', 1);
+
 const app = express();
+app.set('trust proxy', 1);
 
 // Helmet security (CSP relaxed for dev)
 app.use(helmet({
