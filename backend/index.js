@@ -5,7 +5,15 @@ import helmet from "helmet";
 import passport from "./utils/passport.js";
 import dotenv from 'dotenv';
 import { generalRateLimit } from './middleware/validation.js';
+
+// Load environment variables
 dotenv.config();
+
+console.log('Starting server with environment:', process.env.NODE_ENV || 'development');
+console.log('PORT from env:', process.env.PORT);
+console.log('HOST from env:', process.env.HOST);
+console.log('CORS_ORIGINS:', process.env.CORS_ORIGINS);
+
 import authRoute from "./routes/authRoute.js";
 import treeRoute from "./routes/treesRoute.js";
 import imageRoute from "./routes/imageRoute.js";
@@ -47,9 +55,23 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 app.use("/auth", authRoute);
 app.use("/tree", treeRoute);
 app.use("/upload", imageRoute);
-app.listen(process.env.PORT || 4000, process.env.HOST || 'localhost', () => {
-  console.log(`Server running on http://${process.env.HOST || 'localhost'}:${process.env.PORT || 4000}`);
+const PORT = process.env.PORT || 4000;
+const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : (process.env.HOST || 'localhost');
+
+app.listen(PORT, HOST, () => {
+  console.log(`Server running on http://${HOST}:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
