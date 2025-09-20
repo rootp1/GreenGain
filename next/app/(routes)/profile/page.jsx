@@ -1,7 +1,7 @@
 "use client";
 import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../../components/AuthProvider';
-import Protected from '../../../components/Protected';
+
 import { toast } from 'react-toastify';
 import { api1 } from '../../../components/api';
 
@@ -36,7 +36,7 @@ export default function Profile(){
   };
 
   return (
-    <Protected>
+    
     <div className="mx-auto max-w-5xl font-pixel p-4">
   <div className="mb-6 flex flex-col justify-between gap-6 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-300 p-6 text-black shadow md:flex-row">
         <div className="flex items-center gap-6">
@@ -94,6 +94,6 @@ export default function Profile(){
         )}
       </div>
     </div>
-    </Protected>
+    
   );
 }
