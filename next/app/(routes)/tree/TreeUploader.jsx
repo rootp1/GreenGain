@@ -41,11 +41,15 @@ export default function TreeUploader() {
       return;
     }
     try {
-      const { base64 } = await processImageFile(image);
+      const { base64, compressedFile } = await processImageFile(image);
       const safeName = generateSafeFilename(image.name);
       
+      // Create proper data URL format that backend expects
+      const mimeType = compressedFile.type || 'image/jpeg';
+      const dataUrl = `data:${mimeType};base64,${base64}`;
+      
       const response = await api1.post('/upload', { 
-        file: base64, 
+        file: dataUrl, 
         fileName: safeName 
       });
       setImageUrl(response.data.url);

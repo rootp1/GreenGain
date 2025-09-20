@@ -29,15 +29,21 @@ passport.serializeUser((user, cb) => {
   cb(null, user.id);
 });
 passport.deserializeUser(async (id, cb) => {
+  console.log('Deserializing user with ID:', id);
   try {
     const { data, error } = await supabase
       .from("users")
       .select()
       .eq("id", id)
       .single();
-    if (error) return cb(error);
+    if (error) {
+      console.error('Deserialize error:', error);
+      return cb(error);
+    }
+    console.log('User deserialized successfully:', data?.username);
     cb(null, data);
   } catch (err) {
+    console.error('Deserialize exception:', err);
     cb(err);
   }
 });

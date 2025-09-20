@@ -109,6 +109,13 @@ export const logout = (req, res) => {
   });
 };
 export const checkauth = (req, res) => {
+  console.log('Auth check:', {
+    isAuthenticated: req.isAuthenticated(),
+    hasUser: !!req.user,
+    sessionID: req.sessionID,
+    userAgent: req.get('User-Agent')?.substring(0, 50)
+  });
+  
   if (req.isAuthenticated() && req.user) {
     const safeUser = {
       id: req.user.id,
@@ -121,6 +128,7 @@ export const checkauth = (req, res) => {
       user: safeUser 
     });
   } else {
+    console.log('Authentication failed - user not authenticated or no user object');
     return res.status(401).json({ 
       authenticated: false, 
       message: "User is not authenticated" 
