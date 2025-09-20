@@ -17,7 +17,10 @@ console.log('CORS_ORIGINS:', process.env.CORS_ORIGINS);
 import authRoute from "./routes/authRoute.js";
 import treeRoute from "./routes/treesRoute.js";
 import imageRoute from "./routes/imageRoute.js";
+
 const app = express();
+
+// Helmet security (CSP relaxed for dev)
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -29,20 +32,40 @@ app.use(helmet({
     }
   }
 }));
+
+// Rate limiting
 app.use(generalRateLimit);
+
+// Body parser
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-const allowedOrigins = (process.env.CORS_ORIGINS || 'https://green-gain.vercel.app' ).split(/[,\s]+/);
+
+// ✅ CORS setup
+// Split allowed origins by comma/space, remove trailing slashes, and filter out empties
+const allowedOrigins = (process.env.CORS_ORIGINS || 'https://green-gain.vercel.app')
+  .split(/[,\s]+/)
+  .map(o => o.replace(/\/$/, ''))
+  .filter(o => o.length > 0);
+
+console.log("Allowed CORS origins:", allowedOrigins);
+
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    if (!origin) return cb(null, true); // allow non-browser requests (e.g., Postman, curl)
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      return cb(null, true);
+    }
+    console.warn("❌ CORS blocked:", origin);
     return cb(new Error('CORS blocked for origin ' + origin));
   },
   credentials: true
 }));
+
+// Session
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || "fallback_secret",
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -53,6 +76,8 @@ app.use(
     },
   })
 );
+
+// Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -65,13 +90,16 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Routes
 app.use("/auth", authRoute);
 app.use("/tree", treeRoute);
 app.use("/upload", imageRoute);
+
+// Start server
 const PORT = process.env.PORT || 4000;
 const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : (process.env.HOST || 'localhost');
 
 app.listen(PORT, HOST, () => {
-  console.log(`Server running on http://${HOST}:${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`✅ Server running on http://${HOST}:${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
