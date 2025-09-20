@@ -88,6 +88,15 @@ export const login = (req, res, next) => {
         return res.status(500).json({ message: "Login error" });
       }
       loginAttempts.delete(username);
+      
+      // Debug session after login
+      console.log('Login successful:', {
+        userId: user.id,
+        username: user.username,
+        sessionID: req.sessionID,
+        isAuthenticated: req.isAuthenticated()
+      });
+      
       const safeUser = {
         id: user.id,
         username: user.username,

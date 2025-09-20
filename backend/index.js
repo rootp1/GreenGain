@@ -20,7 +20,13 @@ import imageRoute from "./routes/imageRoute.js";
 
 
 const app = express();
-app.set('trust proxy', 1);
+
+// Trust proxy settings for production deployment
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+} else {
+  app.set('trust proxy', 1);
+}
 
 // Helmet security (CSP relaxed for dev)
 app.use(helmet({
@@ -44,7 +50,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // ✅ CORS setup
 // Split allowed origins by comma/space, remove trailing slashes, and filter out empties
-const allowedOrigins = (process.env.CORS_ORIGINS || 'https://green-gain.vercel.app')
+const allowedOrigins = (process.env.CORS_ORIGINS || 'https://green-gain.vercel.app,http://localhost:3000')
   .split(/[,\s]+/)
   .map(o => o.replace(/\/$/, ''))
   .filter(o => o.length > 0);
@@ -53,35 +59,70 @@ console.log("Allowed CORS origins:", allowedOrigins);
 
 app.use(cors({
   origin: (origin, cb) => {
+    console.log('CORS check for origin:', origin);
     if (!origin) return cb(null, true); // allow non-browser requests (e.g., Postman, curl)
     const normalizedOrigin = origin.replace(/\/$/, '');
     if (allowedOrigins.includes(normalizedOrigin)) {
+      console.log('✅ CORS allowed for:', normalizedOrigin);
       return cb(null, true);
     }
     console.warn("❌ CORS blocked:", origin);
     return cb(new Error('CORS blocked for origin ' + origin));
   },
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }));
 
-// Session
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "fallback_secret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: true,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 24 * 60 * 60 * 1000
-    },
-  })
-);
+// Session configuration for cross-origin
+const sessionConfig = {
+  secret: process.env.SESSION_SECRET || "fallback_secret_change_in_production",
+  resave: false,
+  saveUninitialized: false,
+  name: 'greengain.sid',
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    httpOnly: true,
+  }
+};
+
+// Production-specific session settings
+if (process.env.NODE_ENV === 'production') {
+  sessionConfig.cookie.secure = true; // Require HTTPS
+  sessionConfig.cookie.sameSite = 'none'; // Allow cross-origin
+  sessionConfig.proxy = true; // Trust proxy headers
+} else {
+  sessionConfig.cookie.secure = false;
+  sessionConfig.cookie.sameSite = 'lax';
+}
+
+console.log('Session config:', {
+  secure: sessionConfig.cookie.secure,
+  sameSite: sessionConfig.cookie.sameSite,
+  name: sessionConfig.name
+});
+
+app.use(session(sessionConfig));
 
 // Passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Debug middleware to log session info
+app.use((req, res, next) => {
+  if (req.url.includes('/upload') || req.url.includes('/auth')) {
+    console.log('Session Debug:', {
+      url: req.url,
+      method: req.method,
+      sessionID: req.sessionID,
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false,
+      hasUser: !!req.user,
+      userId: req.user?.id,
+      cookies: req.headers.cookie ? 'present' : 'missing',
+      origin: req.headers.origin
+    });
+  }
+  next();
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -89,6 +130,17 @@ app.get('/health', (req, res) => {
     status: 'OK', 
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Test endpoint to check session without auth requirement
+app.get('/test-session', (req, res) => {
+  res.status(200).json({
+    sessionID: req.sessionID,
+    isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false,
+    hasUser: !!req.user,
+    userId: req.user?.id,
+    cookies: req.headers.cookie ? 'present' : 'missing'
   });
 });
 

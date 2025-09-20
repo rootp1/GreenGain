@@ -9,6 +9,12 @@ const requireAuth = (req, res, next) => {
     userAgent: req.get('User-Agent')?.substring(0, 50)
   });
   
+  // TEMPORARY: Skip auth for testing - REMOVE IN PRODUCTION
+  if (process.env.SKIP_AUTH_FOR_TESTING === 'true') {
+    console.log('⚠️  WARNING: Authentication bypassed for testing');
+    return next();
+  }
+  
   if (!req.isAuthenticated() || !req.user) {
     console.log('Image upload authentication failed');
     return res.status(401).json({ error: "Authentication required" });
