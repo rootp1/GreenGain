@@ -50,6 +50,6 @@ app.use(passport.session());
 app.use("/auth", authRoute);
 app.use("/tree", treeRoute);
 app.use("/upload", imageRoute);
-app.listen(4000, () => {
-  console.log("Server running on http://localhost:4000");
+app.listen(process.env.PORT || 4000, process.env.HOST || 'localhost', () => {
+  console.log(`Server running on http://${process.env.HOST || 'localhost'}:${process.env.PORT || 4000}`);
 });

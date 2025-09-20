@@ -1,13 +1,13 @@
 import axios from 'axios';
 
 export const api1 = axios.create({
-	baseURL: 'http://localhost:4000',
+	baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000',
 	headers: { 'Content-Type': 'application/json' },
 	withCredentials: true,
 });
 
 export const api2 = axios.create({
-	baseURL: 'http://localhost:5000',
+	baseURL: process.env.NEXT_PUBLIC_ML_MODEL_URL || 'http://localhost:5000',
 	headers: { 'Content-Type': 'application/json' },
 });
 
